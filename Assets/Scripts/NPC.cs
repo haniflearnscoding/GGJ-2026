@@ -20,7 +20,16 @@ public class NPC : MonoBehaviour
     [SerializeField] private float damageCooldown = 1f;
     private float lastDamageTime;
 
+    [Header("Cough Effect")]
+    [SerializeField] private float coughInterval = 2f;
+    [SerializeField] private float coughRadius = 1.5f;
+    [SerializeField] private int coughParticleCount = 5;
+    [SerializeField] private Color coughColor = new Color(0.6f, 0.8f, 0.3f, 0.7f);
+    [SerializeField] private float coughParticleSpeed = 2f;
+    [SerializeField] private float coughParticleLifetime = 0.5f;
+
     private SpriteRenderer spriteRenderer;
+    private float coughTimer;
     private Vector2 moveDirection;
     private float timer;
     private bool isCuring = false;
@@ -28,6 +37,7 @@ public class NPC : MonoBehaviour
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        coughTimer = Random.Range(0f, coughInterval); // Stagger coughs
     }
 
     void Start()
@@ -67,6 +77,84 @@ public class NPC : MonoBehaviour
         }
 
         transform.position = pos;
+
+        // Cough periodically
+        if (isDiseased)
+        {
+            coughTimer -= Time.deltaTime;
+            if (coughTimer <= 0)
+            {
+                Cough();
+                coughTimer = coughInterval;
+            }
+        }
+    }
+
+    void Cough()
+    {
+        for (int i = 0; i < coughParticleCount; i++)
+        {
+            SpawnCoughParticle();
+        }
+    }
+
+    void SpawnCoughParticle()
+    {
+        GameObject particle = new GameObject("CoughParticle");
+        particle.transform.position = transform.position;
+
+        SpriteRenderer sr = particle.AddComponent<SpriteRenderer>();
+        sr.sprite = CreateCircleSprite(16);
+        sr.color = coughColor;
+        sr.sortingOrder = 5;
+        particle.transform.localScale = Vector3.one * Random.Range(0.1f, 0.25f);
+
+        // Add collider for damage
+        CircleCollider2D col = particle.AddComponent<CircleCollider2D>();
+        col.isTrigger = true;
+        col.radius = 0.5f;
+
+        // Add cough particle behavior
+        CoughParticle cp = particle.AddComponent<CoughParticle>();
+
+        // Random direction with slight upward bias (like a real cough)
+        Vector2 dir = new Vector2(
+            Random.Range(-1f, 1f),
+            Random.Range(-0.3f, 1f)
+        ).normalized;
+
+        cp.Initialize(dir, coughParticleSpeed, coughParticleLifetime, damageToPlayer, this);
+    }
+
+    Sprite CreateCircleSprite(int size = 64)
+    {
+        Texture2D texture = new Texture2D(size, size);
+        Color[] colors = new Color[size * size];
+        Vector2 center = new Vector2(size / 2f, size / 2f);
+        float radius = size / 2f;
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dist = Vector2.Distance(new Vector2(x, y), center);
+                if (dist < radius)
+                {
+                    float alpha = 1f - (dist / radius);
+                    alpha = alpha * alpha;
+                    colors[y * size + x] = new Color(1f, 1f, 1f, alpha);
+                }
+                else
+                {
+                    colors[y * size + x] = Color.clear;
+                }
+            }
+        }
+
+        texture.SetPixels(colors);
+        texture.Apply();
+
+        return Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
     }
 
     void PickRandomDirection()
@@ -131,45 +219,27 @@ public class NPC : MonoBehaviour
         return isDiseased;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        Debug.Log($"NPC OnTriggerEnter2D: {other.name}");
-    }
-
     void OnTriggerStay2D(Collider2D other)
     {
-        Debug.Log($"NPC OnTriggerStay2D: {other.name}, isDiseased={isDiseased}, isCuring={isCuring}");
-
         if (!isDiseased || isCuring) return;
         if (Time.time < lastDamageTime + damageCooldown) return;
 
         PlayerController player = other.GetComponent<PlayerController>();
-        Debug.Log($"PlayerController found: {player != null}");
         if (player != null)
         {
-            Debug.Log("Dealing damage to player!");
             player.TakeDamage(damageToPlayer);
             lastDamageTime = Time.time;
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        Debug.Log($"NPC OnCollisionEnter2D: {collision.gameObject.name}");
-    }
-
     void OnCollisionStay2D(Collision2D collision)
     {
-        Debug.Log($"NPC OnCollisionStay2D: {collision.gameObject.name}, isDiseased={isDiseased}, isCuring={isCuring}");
-
         if (!isDiseased || isCuring) return;
         if (Time.time < lastDamageTime + damageCooldown) return;
 
         PlayerController player = collision.gameObject.GetComponent<PlayerController>();
-        Debug.Log($"PlayerController found: {player != null}");
         if (player != null)
         {
-            Debug.Log("Dealing damage to player!");
             player.TakeDamage(damageToPlayer);
             lastDamageTime = Time.time;
         }
