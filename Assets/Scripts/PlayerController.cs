@@ -6,31 +6,37 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 0.2f;
+
     private float nextFireTime;
-    
-    private Rigidbody2D rb;
     private Vector2 movement;
     private Vector2 mousePos;
     private Camera mainCam;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
     }
 
     void Update()
     {
-        // Get movement input
+        if (mainCam == null)
+        {
+            mainCam = Camera.main;
+            return;
+        }
+
+        // Movement input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
-        
-        // Get mouse position for aiming (need Z depth for 2D)
-        mousePos = mainCam.ScreenToWorldPoint(new Vector3(
-            Input.mousePosition.x,
-            Input.mousePosition.y,
-            -mainCam.transform.position.z
-        ));
+
+        // Mouse position
+        mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+
+        // Rotate toward mouse
+        Vector2 lookDir = mousePos - (Vector2)transform.position;
+        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+
         // Shooting
         if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
         {
@@ -41,16 +47,12 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Move player
-        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
-        
-        // Rotate toward mouse
-        Vector2 lookDir = mousePos - rb.position;
-        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
-        rb.rotation = angle;
+        transform.position += (Vector3)(movement.normalized * moveSpeed * Time.fixedDeltaTime);
     }
+
     void Shoot()
     {
+        if (bulletPrefab == null || firePoint == null) return;
         Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
 }

@@ -2,22 +2,28 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] private float speed = 4f;
+    [SerializeField] private float speed = 8f;
     [SerializeField] private float lifetime = 3f;
-    
-    private Rigidbody2D rb;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        rb.linearVelocity = transform.up * speed;
         Destroy(gameObject, lifetime);
+    }
+
+    void Update()
+    {
+        transform.position += transform.up * speed * Time.deltaTime;
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Enemy"))
         {
+            NPC npc = other.GetComponent<NPC>();
+            if (npc != null)
+            {
+                npc.Cure();
+            }
             Destroy(gameObject);
         }
     }
