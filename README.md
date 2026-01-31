@@ -1,10 +1,10 @@
 # GGJ 2026 - Game Jam Project
 
 ## Team
-- [Add team members here]
+- Catherine, Hanif, Clinton
 
 ## Game Concept
-- **Title:** [TBD - after theme reveal]
+- **Title:** [TBD -theme: Mask]
 - **Genre:** [TBD]
 - **Elevator Pitch:** [Keep it to 1-2 sentences, ~140 characters]
 
