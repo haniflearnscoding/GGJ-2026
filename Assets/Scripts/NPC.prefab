@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7eb6c5d7c1e4463b8eb0188de2f0589, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  moveSpeed: 2
+  moveSpeed: 0.5
   changeDirectionTime: 2
   isDiseased: 1
   healthyColor: {r: 0, g: 1, b: 0, a: 1}

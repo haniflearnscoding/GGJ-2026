@@ -9,7 +9,7 @@ public class NPCSpawner : MonoBehaviour
 
     void Start()
     {
-        if (npcPrefab == null) return;
+        if (npcPrefab == null) return;  
 
         for (int i = 0; i < spawnCount; i++)
         {
