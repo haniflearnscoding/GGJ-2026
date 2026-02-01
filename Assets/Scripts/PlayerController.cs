@@ -60,6 +60,12 @@ public class PlayerController : MonoBehaviour
         if (SFXManager.Instance != null)
             SFXManager.Instance.PlaySound("hit");
 
+        // Camera shake on damage
+        if (CameraShake.Instance != null)
+            CameraShake.Instance.ShakeHeavy();
+        else
+            Debug.LogWarning("CameraShake.Instance is NULL! Add CameraShake component to the Main Camera.");
+
         if (currentLives <= 0)
         {
             Die();

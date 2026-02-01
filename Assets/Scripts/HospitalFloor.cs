@@ -4,8 +4,8 @@ public class HospitalFloor : MonoBehaviour
 {
     [Header("Floor Settings")]
     [SerializeField] private Sprite tileSprite;
-    [SerializeField] private int tilesX = 30;
-    [SerializeField] private int tilesY = 20;
+    [SerializeField] private int tilesX = 200;
+    [SerializeField] private int tilesY = 200;
     [SerializeField] private float tileSize = 1f;
 
     void Start()

@@ -73,6 +73,10 @@ public class Bullet : MonoBehaviour
             if (npc != null)
             {
                 npc.Cure();
+
+                // Camera shake on successful cure
+                if (CameraShake.Instance != null)
+                    CameraShake.Instance.ShakeLight();
             }
             Destroy(gameObject);
         }

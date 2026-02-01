@@ -6,7 +6,10 @@
         <ui:VisualElement name="heart-3" class="heart heart-full" />
     </ui:VisualElement>
     <ui:VisualElement name="time-container" class="time-container">
-        <ui:Label name="time-label" text="9:00 AM" class="time-label" />
+        <ui:VisualElement name="time-row" class="time-row">
+            <ui:VisualElement name="clock-icon" class="clock-icon" />
+            <ui:Label name="time-label" text="9:00 AM" class="time-label" />
+        </ui:VisualElement>
         <ui:Label name="shift-label" text="Shift: 9AM - 5PM" class="shift-label" />
     </ui:VisualElement>
 </ui:UXML>

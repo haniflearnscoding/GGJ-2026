@@ -5,9 +5,11 @@ using System.Collections.Generic;
 public class HealthBar : MonoBehaviour
 {
     [SerializeField] private PlayerController player;
+    [SerializeField] private Sprite clockSprite;
 
     private UIDocument uiDocument;
     private Label timeLabel;
+    private VisualElement clockIcon;
     private List<VisualElement> hearts = new List<VisualElement>();
 
     void Start()
@@ -17,6 +19,13 @@ public class HealthBar : MonoBehaviour
         if (uiDocument != null)
         {
             timeLabel = uiDocument.rootVisualElement.Q<Label>("time-label");
+            clockIcon = uiDocument.rootVisualElement.Q<VisualElement>("clock-icon");
+
+            // Set clock sprite from Inspector
+            if (clockIcon != null && clockSprite != null)
+            {
+                clockIcon.style.backgroundImage = new StyleBackground(clockSprite);
+            }
 
             // Get all hearts
             hearts.Add(uiDocument.rootVisualElement.Q<VisualElement>("heart-1"));

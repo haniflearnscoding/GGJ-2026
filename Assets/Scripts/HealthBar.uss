@@ -33,6 +33,18 @@
     align-items: flex-end;
 }
 
+.time-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.clock-icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
 .time-label {
     font-size: 28px;
     color: rgb(255, 255, 255);

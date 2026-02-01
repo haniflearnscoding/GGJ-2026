@@ -52,7 +52,7 @@ public class SplashScreen : MonoBehaviour
         spriteRenderer.sprite = splashSprite;
         spriteRenderer.sortingOrder = 1000;
 
-        // Scale to fill screen
+        // Scale to fit screen
         if (Camera.main != null && splashSprite != null)
         {
             float screenHeight = Camera.main.orthographicSize * 2f;
@@ -63,7 +63,7 @@ public class SplashScreen : MonoBehaviour
 
             float scaleX = screenWidth / spriteWidth;
             float scaleY = screenHeight / spriteHeight;
-            float scale = Mathf.Max(scaleX, scaleY);
+            float scale = Mathf.Min(scaleX, scaleY); // Fit instead of fill
 
             splashObject.transform.localScale = Vector3.one * scale;
             splashObject.transform.position = Camera.main.transform.position + Vector3.forward * 5f;
