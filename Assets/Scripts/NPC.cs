@@ -4,34 +4,43 @@ using System.Collections;
 public class NPC : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 0.1f;
-        [SerializeField] private float changeDirectionTime = 2f;
     [SerializeField] private bool isDiseased = true;
-    [SerializeField] private Color healthyColor = Color.green;
-    [SerializeField] private Color diseasedColor = Color.red;
-    [SerializeField] private Vector2 boundsMin = new Vector2(-8f, -4f);
-    [SerializeField] private Vector2 boundsMax = new Vector2(8f, 4f);
+    [SerializeField] private bool trackPlayer = true;
+
+    [Header("Sprites")]
+    [SerializeField] private Sprite spriteDown;
+    [SerializeField] private Sprite spriteUp;
+    [SerializeField] private Sprite spriteLeft;
+    [SerializeField] private Sprite spriteRight;
+    [SerializeField] private Sprite[] walkDown;
+    [SerializeField] private Sprite[] walkUp;
+    [SerializeField] private Sprite[] walkLeft;
+    [SerializeField] private Sprite[] walkRight;
+    [SerializeField] private float walkAnimSpeed = 0.15f;
+
+    private Transform playerTarget;
+    private float walkAnimTimer;
+    private int walkFrame;
+    private Vector2 lastDirection = Vector2.down;
 
     [Header("Cure Effect")]
-    [SerializeField] private float cureEffectDuration = 0.5f;
-    [SerializeField] private Color flashColor = Color.white;
+    [SerializeField] private float cureEffectDuration = 0.3f;
+    [SerializeField] private Sprite curedSprite;
 
     [Header("Damage")]
-    [SerializeField] private int damageToPlayer = 10;
-    [SerializeField] private float damageCooldown = 1f;
+    [SerializeField] private int damageToPlayer = 1;
+    [SerializeField] private float damageCooldown = 2f;
     private float lastDamageTime;
 
     [Header("Cough Effect")]
-    [SerializeField] private float coughInterval = 2f;
-    [SerializeField] private float coughRadius = 1.5f;
+    [SerializeField] private float coughInterval = 3f;
     [SerializeField] private int coughParticleCount = 5;
-    [SerializeField] private Color coughColor = new Color(0.6f, 0.8f, 0.3f, 0.7f);
+    [SerializeField] private Sprite coughSprite; // Assign Z_cough1 in Inspector
     [SerializeField] private float coughParticleSpeed = 2f;
-    [SerializeField] private float coughParticleLifetime = 0.5f;
+    [SerializeField] private float coughParticleLifetime = 1.5f;
 
     private SpriteRenderer spriteRenderer;
     private float coughTimer;
-    private Vector2 moveDirection;
-    private float timer;
     private bool isCuring = false;
 
     void Awake()
@@ -42,41 +51,42 @@ public class NPC : MonoBehaviour
 
     void Start()
     {
-        PickRandomDirection();
         UpdateVisuals();
 
-        var col = GetComponent<Collider2D>();
-        var rb = GetComponent<Rigidbody2D>();
-        Debug.Log($"NPC Start - Collider: {col != null}, IsTrigger: {(col != null ? col.isTrigger : false)}, Rigidbody2D: {rb != null}");
+        // Find player
+        PlayerController player = FindAnyObjectByType<PlayerController>();
+        if (player != null)
+        {
+            playerTarget = player.transform;
+        }
     }
 
     void Update()
     {
         if (isCuring) return; // Stop movement during cure effect
 
-        timer -= Time.deltaTime;
-        if (timer <= 0)
+        bool isMoving = false;
+
+        // Track player
+        if (trackPlayer && playerTarget != null && isDiseased)
         {
-            PickRandomDirection();
+            Vector2 direction = (playerTarget.position - transform.position).normalized;
+            transform.position += (Vector3)(direction * moveSpeed * Time.deltaTime);
+            isMoving = true;
+
+            // Update facing direction
+            if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x))
+            {
+                lastDirection = direction.y > 0 ? Vector2.up : Vector2.down;
+            }
+            else
+            {
+                lastDirection = direction.x > 0 ? Vector2.right : Vector2.left;
+            }
         }
 
-        // Move
-        Vector3 pos = transform.position;
-        pos += (Vector3)(moveDirection * moveSpeed * Time.deltaTime);
-
-        // Bounce off bounds
-        if (pos.x < boundsMin.x || pos.x > boundsMax.x)
-        {
-            moveDirection.x *= -1;
-            pos.x = Mathf.Clamp(pos.x, boundsMin.x, boundsMax.x);
-        }
-        if (pos.y < boundsMin.y || pos.y > boundsMax.y)
-        {
-            moveDirection.y *= -1;
-            pos.y = Mathf.Clamp(pos.y, boundsMin.y, boundsMax.y);
-        }
-
-        transform.position = pos;
+        // Update sprite animation
+        UpdateSpriteDirection(isMoving);
 
         // Cough periodically
         if (isDiseased)
@@ -90,8 +100,66 @@ public class NPC : MonoBehaviour
         }
     }
 
+    void UpdateSpriteDirection(bool isMoving)
+    {
+        if (spriteRenderer == null) return;
+
+        // Handle walk animation
+        if (isMoving)
+        {
+            walkAnimTimer += Time.deltaTime;
+            if (walkAnimTimer >= walkAnimSpeed)
+            {
+                walkAnimTimer = 0f;
+                walkFrame = (walkFrame + 1) % 2;
+            }
+        }
+        else
+        {
+            walkFrame = 0;
+            walkAnimTimer = 0f;
+        }
+
+        // Set sprite based on direction
+        Sprite[] currentWalkSprites = null;
+        Sprite idleSprite = null;
+
+        if (lastDirection == Vector2.up)
+        {
+            idleSprite = spriteUp;
+            currentWalkSprites = walkUp;
+        }
+        else if (lastDirection == Vector2.down)
+        {
+            idleSprite = spriteDown;
+            currentWalkSprites = walkDown;
+        }
+        else if (lastDirection == Vector2.left)
+        {
+            idleSprite = spriteLeft;
+            currentWalkSprites = walkLeft;
+        }
+        else if (lastDirection == Vector2.right)
+        {
+            idleSprite = spriteRight;
+            currentWalkSprites = walkRight;
+        }
+
+        if (isMoving && currentWalkSprites != null && currentWalkSprites.Length > 0)
+        {
+            spriteRenderer.sprite = currentWalkSprites[walkFrame % currentWalkSprites.Length];
+        }
+        else if (idleSprite != null)
+        {
+            spriteRenderer.sprite = idleSprite;
+        }
+    }
+
     void Cough()
     {
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.PlaySound("cough");
+
         for (int i = 0; i < coughParticleCount; i++)
         {
             SpawnCoughParticle();
@@ -104,70 +172,43 @@ public class NPC : MonoBehaviour
         particle.transform.position = transform.position;
 
         SpriteRenderer sr = particle.AddComponent<SpriteRenderer>();
-        sr.sprite = CreateCircleSprite(16);
-        sr.color = coughColor;
+        sr.sprite = coughSprite;
         sr.sortingOrder = 5;
-        particle.transform.localScale = Vector3.one * Random.Range(0.1f, 0.25f);
+
+        // Varying sizes for natural look
+        float size = Random.Range(0.8f, 1.2f);
+        particle.transform.localScale = Vector3.one * size;
 
         // Add collider for damage
         CircleCollider2D col = particle.AddComponent<CircleCollider2D>();
         col.isTrigger = true;
-        col.radius = 0.5f;
+        col.radius = 0.3f;
 
         // Add cough particle behavior
         CoughParticle cp = particle.AddComponent<CoughParticle>();
 
-        // Random direction with slight upward bias (like a real cough)
+        // AIM AT PLAYER with spread
+        Vector2 toPlayer = Vector2.up; // Default if no player
+        if (playerTarget != null)
+        {
+            toPlayer = ((Vector2)playerTarget.position - (Vector2)transform.position).normalized;
+        }
+
+        // Add spread angle (wide cone toward player)
+        float spreadAngle = Random.Range(-60f, 60f) * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(spreadAngle);
+        float sin = Mathf.Sin(spreadAngle);
         Vector2 dir = new Vector2(
-            Random.Range(-1f, 1f),
-            Random.Range(-0.3f, 1f)
-        ).normalized;
+            toPlayer.x * cos - toPlayer.y * sin,
+            toPlayer.x * sin + toPlayer.y * cos
+        );
 
         cp.Initialize(dir, coughParticleSpeed, coughParticleLifetime, damageToPlayer, this);
     }
 
-    Sprite CreateCircleSprite(int size = 64)
-    {
-        Texture2D texture = new Texture2D(size, size);
-        Color[] colors = new Color[size * size];
-        Vector2 center = new Vector2(size / 2f, size / 2f);
-        float radius = size / 2f;
-
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                float dist = Vector2.Distance(new Vector2(x, y), center);
-                if (dist < radius)
-                {
-                    float alpha = 1f - (dist / radius);
-                    alpha = alpha * alpha;
-                    colors[y * size + x] = new Color(1f, 1f, 1f, alpha);
-                }
-                else
-                {
-                    colors[y * size + x] = Color.clear;
-                }
-            }
-        }
-
-        texture.SetPixels(colors);
-        texture.Apply();
-
-        return Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
-    }
-
-    void PickRandomDirection()
-    {
-        float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-        moveDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-        timer = changeDirectionTime;
-    }
-
     void UpdateVisuals()
     {
-        if (spriteRenderer == null) return;
-        spriteRenderer.color = isDiseased ? diseasedColor : healthyColor;
+        // Sprites handle visuals now
     }
 
     public void Cure()
@@ -175,6 +216,10 @@ public class NPC : MonoBehaviour
         if (!isDiseased || isCuring) return;
         isDiseased = false;
         isCuring = true;
+
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.PlaySound("cure");
+
         StartCoroutine(CureEffect());
     }
 
@@ -183,27 +228,26 @@ public class NPC : MonoBehaviour
         Vector3 originalScale = transform.localScale;
         float elapsed = 0f;
 
-        // Flash white and pop up
-        if (spriteRenderer != null)
-            spriteRenderer.color = flashColor;
-        transform.localScale = originalScale * 1.3f;
+        // Show cured sprite
+        if (curedSprite != null && spriteRenderer != null)
+        {
+            spriteRenderer.sprite = curedSprite;
+        }
 
-        yield return new WaitForSeconds(0.1f);
+        // Stay visible for a moment
+        yield return new WaitForSeconds(0.5f);
 
         // Fade out and shrink
-        float fadeTime = cureEffectDuration - 0.1f;
-        while (elapsed < fadeTime)
+        while (elapsed < cureEffectDuration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / fadeTime;
+            float t = elapsed / cureEffectDuration;
 
-            // Shrink
-            transform.localScale = Vector3.Lerp(originalScale * 1.3f, Vector3.zero, t);
+            transform.localScale = Vector3.Lerp(originalScale, Vector3.zero, t);
 
-            // Fade
             if (spriteRenderer != null)
             {
-                Color c = healthyColor;
+                Color c = spriteRenderer.color;
                 c.a = 1f - t;
                 spriteRenderer.color = c;
             }

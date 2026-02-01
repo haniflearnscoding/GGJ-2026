@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        player = FindObjectOfType<PlayerController>();
+        player = FindAnyObjectByType<PlayerController>();
         currentGameHour = shiftStartHour;
 
         if (winUI != null) winUI.SetActive(false);
@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
     {
         if (player == null) return;
 
-        if (player.GetCurrentHealth() <= 0)
+        if (player.GetCurrentLives() <= 0)
         {
             Lose();
         }
@@ -89,6 +89,9 @@ public class GameManager : MonoBehaviour
         gameOver = true;
         hasWon = true;
         Debug.Log("YOU WIN!");
+
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.PlaySound("win");
 
         if (winUI != null) winUI.SetActive(true);
 
@@ -101,6 +104,9 @@ public class GameManager : MonoBehaviour
         gameOver = true;
         hasWon = false;
         Debug.Log("GAME OVER!");
+
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.PlaySound("lose");
 
         if (loseUI != null) loseUI.SetActive(true);
 

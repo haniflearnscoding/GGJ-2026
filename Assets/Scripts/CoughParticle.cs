@@ -25,22 +25,20 @@ public class CoughParticle : MonoBehaviour
     {
         elapsed += Time.deltaTime;
 
-        // Move outward
-        transform.position += (Vector3)(direction * speed * Time.deltaTime);
+        // Move in direction at speed
+        transform.position += (Vector3)(direction.normalized * speed * Time.deltaTime);
 
-        // Slow down over time
-        speed *= 0.98f;
-
-        // Fade out and grow slightly
+        // Only fade in the last 10% of lifetime
         if (spriteRenderer != null)
         {
-            float t = elapsed / lifetime;
-            Color c = spriteRenderer.color;
-            c.a = Mathf.Lerp(0.7f, 0f, t);
-            spriteRenderer.color = c;
-
-            // Grow slightly as it disperses
-            transform.localScale *= 1.01f;
+            float fadeStart = lifetime * 0.9f;
+            if (elapsed > fadeStart)
+            {
+                float fadeProgress = (elapsed - fadeStart) / (lifetime - fadeStart);
+                Color c = spriteRenderer.color;
+                c.a = Mathf.Lerp(1f, 0f, fadeProgress);
+                spriteRenderer.color = c;
+            }
         }
 
         // Destroy when lifetime is up
