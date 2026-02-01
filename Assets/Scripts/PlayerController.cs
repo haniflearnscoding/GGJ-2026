@@ -25,11 +25,11 @@ public class PlayerController : MonoBehaviour
     private int walkFrame;
     private Vector2 lastDirection = Vector2.down;
 
-    [Header("Health")]
-    [SerializeField] private int maxHealth = 100;
-    private int currentHealth;
+    [Header("Lives")]
+    [SerializeField] private int maxLives = 3;
+    private int currentLives;
 
-    public event System.Action<int, int> OnHealthChanged; // current, max
+    public event System.Action<int, int> OnLivesChanged; // current, max
 
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
@@ -47,17 +47,20 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         mainCam = Camera.main;
-        currentHealth = maxHealth;
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        currentLives = maxLives;
+        OnLivesChanged?.Invoke(currentLives, maxLives);
     }
 
     public void TakeDamage(int damage)
     {
-        Debug.Log($"Player TakeDamage called: {damage} damage, health: {currentHealth} -> {currentHealth - damage}");
-        currentHealth = Mathf.Max(0, currentHealth - damage);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        currentLives = Mathf.Max(0, currentLives - 1);
+        Debug.Log($"Player lost a life! Lives: {currentLives}");
+        OnLivesChanged?.Invoke(currentLives, maxLives);
 
-        if (currentHealth <= 0)
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.PlaySound("hit");
+
+        if (currentLives <= 0)
         {
             Die();
         }
@@ -65,8 +68,8 @@ public class PlayerController : MonoBehaviour
 
     public void Heal(int amount)
     {
-        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        currentLives = Mathf.Min(maxLives, currentLives + 1);
+        OnLivesChanged?.Invoke(currentLives, maxLives);
     }
 
     void Die()
@@ -76,8 +79,8 @@ public class PlayerController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public int GetCurrentHealth() => currentHealth;
-    public int GetMaxHealth() => maxHealth;
+    public int GetCurrentLives() => currentLives;
+    public int GetMaxLives() => maxLives;
 
     void Update()
     {
@@ -193,5 +196,8 @@ public class PlayerController : MonoBehaviour
         Quaternion bulletRotation = Quaternion.Euler(0, 0, angle);
 
         Instantiate(bulletPrefab, firePoint.position, bulletRotation);
+
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.PlaySound("throw");
     }
 }

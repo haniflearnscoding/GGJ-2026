@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.01188, y: 1.03911, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -91,7 +91,7 @@ SpriteRenderer:
   m_Size: {x: 0.2, y: 0.2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!58 &1818188937135971576
 CircleCollider2D:
@@ -141,10 +141,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7eb6c5d7c1e4463b8eb0188de2f0589, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  moveSpeed: 0.5
-  changeDirectionTime: 2
+  moveSpeed: 1
   isDiseased: 1
-  healthyColor: {r: 0, g: 1, b: 0, a: 1}
-  diseasedColor: {r: 1, g: 0, b: 0, a: 1}
-  boundsMin: {x: -8, y: -4}
-  boundsMax: {x: 8, y: 4}
+  trackPlayer: 1
+  spriteDown: {fileID: 1200427127, guid: d1b721ab4226849cc9d38a84b8711e81, type: 3}
+  spriteUp: {fileID: 970046377, guid: 71ed84de01b144a0facc0965ebbdbaa8, type: 3}
+  spriteLeft: {fileID: 405204685, guid: 409b3a5f4da4d46ebae76d8dead51448, type: 3}
+  spriteRight: {fileID: 1834332143, guid: e06cd38a27dae4635878428fbad7cc57, type: 3}
+  walkDown:
+  - {fileID: 216627229, guid: 3d595ad5e72ba4f738f4978459d91724, type: 3}
+  - {fileID: 731781320, guid: 7d6d0212f90734113a299a4630630897, type: 3}
+  walkUp:
+  - {fileID: 1405590884, guid: 77c8619de874c479c81960319f26299a, type: 3}
+  - {fileID: 1642721049, guid: 059ff140045644e36beec3220944b892, type: 3}
+  walkLeft:
+  - {fileID: -221944469, guid: b8fbc7aa9aa5e4b119ca1900fed5570b, type: 3}
+  - {fileID: 1574988722, guid: d5213ed406f0d476c89cf589525a6561, type: 3}
+  walkRight:
+  - {fileID: -251686961, guid: 4cc7d1ac9f2754db882c43eba3660c83, type: 3}
+  - {fileID: -1830651106, guid: cac43d3a0dbbd45c5b1aa693dac441af, type: 3}
+  walkAnimSpeed: 0.15
+  cureEffectDuration: 0.5
+  curedSprite: {fileID: -1356805075, guid: 62c0c0da3fe624f54a85ec09969dd333, type: 3}
+  damageToPlayer: 1
+  damageCooldown: 2
+  coughInterval: 3
+  coughParticleCount: 5
+  coughSprite: {fileID: -84634934, guid: 765c48ed538864151b9af0d1807c53c0, type: 3}
+  coughParticleSpeed: 1
+  coughParticleLifetime: 0.5

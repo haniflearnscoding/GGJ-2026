@@ -1,11 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="HealthBar.uss" />
-    <ui:VisualElement name="health-container" class="health-container">
-        <ui:Label name="health-label" text="HEALTH" class="health-label" />
-        <ui:VisualElement name="health-bar-bg" class="health-bar-bg">
-            <ui:VisualElement name="health-bar-fill" class="health-bar-fill" />
-        </ui:VisualElement>
-        <ui:Label name="health-text" text="100/100" class="health-label" />
+    <ui:VisualElement name="lives-container" class="lives-container">
+        <ui:VisualElement name="heart-1" class="heart heart-full" />
+        <ui:VisualElement name="heart-2" class="heart heart-full" />
+        <ui:VisualElement name="heart-3" class="heart heart-full" />
     </ui:VisualElement>
     <ui:VisualElement name="time-container" class="time-container">
         <ui:Label name="time-label" text="9:00 AM" class="time-label" />
