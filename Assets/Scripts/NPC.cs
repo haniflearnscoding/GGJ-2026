@@ -4,7 +4,7 @@ using System.Collections;
 public class NPC : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 0.1f;
-    [SerializeField] private float changeDirectionTime = 2f;
+        [SerializeField] private float changeDirectionTime = 2f;
     [SerializeField] private bool isDiseased = true;
     [SerializeField] private Color healthyColor = Color.green;
     [SerializeField] private Color diseasedColor = Color.red;

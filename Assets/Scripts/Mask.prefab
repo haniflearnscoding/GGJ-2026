@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.01188, y: 1.03911, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -84,12 +84,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: -981825376, guid: 4fafc738ae218477faeda7382dbca10d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.2, y: 0.2}
+  m_Size: {x: 0.11, y: 0.05}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -169,5 +169,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec34af83aaf43485db97a5aee5455a3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
-  speed: 4
+  speed: 2.5
   lifetime: 3
+  spinSpeed: 720
+  spinSprites:
+  - {fileID: -981825376, guid: 4fafc738ae218477faeda7382dbca10d, type: 3}
+  - {fileID: -766890561, guid: 228e43e9d4aae4ef091f8a5d6cbca84c, type: 3}
+  - {fileID: 1776355917, guid: 4b828381f8af749a48664aebc093fa83, type: 3}
+  spriteAnimSpeed: 0.1
+  defaultSprite: {fileID: 0}

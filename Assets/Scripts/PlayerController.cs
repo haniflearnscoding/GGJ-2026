@@ -10,11 +10,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 0.2f;
 
-    [Header("Sprites (assign from sliced sprite sheet)")]
+    [Header("Sprites")]
     [SerializeField] private Sprite spriteDown;
     [SerializeField] private Sprite spriteUp;
     [SerializeField] private Sprite spriteLeft;
     [SerializeField] private Sprite spriteRight;
+    [SerializeField] private Sprite[] walkDown;
+    [SerializeField] private Sprite[] walkUp;
+    [SerializeField] private Sprite[] walkLeft;
+    [SerializeField] private Sprite[] walkRight;
+    [SerializeField] private float walkAnimSpeed = 0.15f;
+
+    private float walkAnimTimer;
+    private int walkFrame;
+    private Vector2 lastDirection = Vector2.down;
 
     [Header("Health")]
     [SerializeField] private int maxHealth = 100;
@@ -99,22 +108,70 @@ public class PlayerController : MonoBehaviour
     void UpdateSpriteDirection()
     {
         if (spriteRenderer == null) return;
-        if (movement == Vector2.zero) return; // Keep last direction when idle
 
-        // Prioritize vertical if moving more vertically, else horizontal
-        if (Mathf.Abs(movement.y) >= Mathf.Abs(movement.x))
+        bool isMoving = movement != Vector2.zero;
+
+        // Update direction when moving
+        if (isMoving)
         {
-            if (movement.y > 0 && spriteUp != null)
-                spriteRenderer.sprite = spriteUp;
-            else if (movement.y < 0 && spriteDown != null)
-                spriteRenderer.sprite = spriteDown;
+            if (Mathf.Abs(movement.y) >= Mathf.Abs(movement.x))
+            {
+                lastDirection = movement.y > 0 ? Vector2.up : Vector2.down;
+            }
+            else
+            {
+                lastDirection = movement.x > 0 ? Vector2.right : Vector2.left;
+            }
+        }
+
+        // Handle walk animation
+        if (isMoving)
+        {
+            walkAnimTimer += Time.deltaTime;
+            if (walkAnimTimer >= walkAnimSpeed)
+            {
+                walkAnimTimer = 0f;
+                walkFrame = (walkFrame + 1) % 2;
+            }
         }
         else
         {
-            if (movement.x > 0 && spriteRight != null)
-                spriteRenderer.sprite = spriteRight;
-            else if (movement.x < 0 && spriteLeft != null)
-                spriteRenderer.sprite = spriteLeft;
+            walkFrame = 0;
+            walkAnimTimer = 0f;
+        }
+
+        // Set sprite based on direction and animation frame
+        Sprite[] currentWalkSprites = null;
+        Sprite idleSprite = null;
+
+        if (lastDirection == Vector2.up)
+        {
+            idleSprite = spriteUp;
+            currentWalkSprites = walkUp;
+        }
+        else if (lastDirection == Vector2.down)
+        {
+            idleSprite = spriteDown;
+            currentWalkSprites = walkDown;
+        }
+        else if (lastDirection == Vector2.left)
+        {
+            idleSprite = spriteLeft;
+            currentWalkSprites = walkLeft;
+        }
+        else if (lastDirection == Vector2.right)
+        {
+            idleSprite = spriteRight;
+            currentWalkSprites = walkRight;
+        }
+
+        if (isMoving && currentWalkSprites != null && currentWalkSprites.Length > 0)
+        {
+            spriteRenderer.sprite = currentWalkSprites[walkFrame % currentWalkSprites.Length];
+        }
+        else if (idleSprite != null)
+        {
+            spriteRenderer.sprite = idleSprite;
         }
     }
 

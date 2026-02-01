@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="GameStateUI.uss" />
+
+    <ui:VisualElement name="win-screen" class="game-state-screen">
+        <ui:Label text="SHIFT COMPLETE!" class="title win-title" />
+        <ui:Label text="You clocked out safely at 5:00 PM!" class="subtitle" />
+        <ui:Button name="restart-btn" text="Next Shift" class="game-btn" />
+    </ui:VisualElement>
+
+    <ui:VisualElement name="lose-screen" class="game-state-screen">
+        <ui:Label text="CALLED IN SICK" class="title lose-title" />
+        <ui:Label text="You caught the bug..." class="subtitle" />
+        <ui:Button name="restart-btn-lose" text="Try Again" class="game-btn" />
+    </ui:VisualElement>
+</ui:UXML>
